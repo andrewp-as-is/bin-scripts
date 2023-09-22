@@ -1,0 +1,49 @@
+#!/usr/bin/env bash
+{ set +x; } 2>/dev/null
+
+[[ "$PWD" != */git/* ]] && echo "ERROR: $PWD" 1>&2 && exit 1
+
+( set -x; bash ~/git/readme-metadata/scripts/init.sh )
+( set -x; bash ~/git/readme-generator/scripts/init.sh )
+
+[ -e tests ] && [[ $PWD != */dotfiles ]] && {
+    ! [ -e .github/workflows ] && { ( set -x; mkdir -p .github/workflows ) || exit; }
+
+    cat <<EOF > .github/workflows/tests42.yml || exit
+name: tests42
+on: [push, pull_request]
+jobs:
+  build:
+    runs-on: [ubuntu-latest]
+    steps:
+    - uses: actions/checkout@v1
+    - uses: actions/setup-python@v1
+    - uses: andrewp-as-is/python-tests42-action@master
+EOF
+unlicense-text > UNLICENSE || exit
+};:
+[ -e package.json ] && {
+    cat <<EOF > .npmignore
+# ~/.npmignore NOT SUPPORTED :(
+
+.*
+/build
+/.config
+/dist
+/examples
+/Icon
+/Icon?
+/MANIFEST
+/MANIFEST.in
+/setup.cfg
+/tests
+.DS_Store
+*.egg-info
+*.md
+*.py
+*.pyc
+*.txt
+*.yml
+UNLICENSE
+EOF
+};:

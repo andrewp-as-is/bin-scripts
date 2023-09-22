@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+{ set +x; } 2>/dev/null
+
+echo -n -e "\033]0;$1\007"

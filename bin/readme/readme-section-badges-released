@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+{ set +x; } 2>/dev/null
+
+! [ -e setup.py ] && exit
+
+INSTALL_NAME="$(echo "$PWD" | xargs basename | cut -d. -f1)"
+RELEASED="$(python3 setup.py --version)" || exit
+[[ -z "$RELEASED" ]] && echo "ERROR: RELEASED empty" && exit 1
+export INSTALL_NAME="$INSTALL_NAME"
+export RELEASED="$RELEASED"
+
+cat <<"EOF" | envsubst;:
+[![](https://img.shields.io/badge/released-${RELEASED}-green.svg?longCache=True)](https://pypi.org/project/${INSTALL_NAME}/)
+EOF

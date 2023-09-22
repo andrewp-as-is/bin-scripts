@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+{ set +x; } 2>/dev/null
+
+usage() {
+    echo "usage: $(basename $0) path"
+    [[ $1 == "-h" ]] || [[ $1 == "--help" ]]; exit
+}
+
+[[ $1 == "-h" ]] || [[ $1 == "--help" ]] && usage "$@"
+
+[[ $# == 0 ]] && usage
+
+cd "$1" || exit
+
+( cat ~/.env_templates/django/prod.env; find ../_base ../_base/prod prod -name "*.env" -maxdepth 1 -exec cat {} \;; find . -name "*.env" -maxdepth 1 -exec cat {} \; ) > /tmp/prod.env
+dirname=/usr/share/docker-compose/"${PWD##*/}"
+scp /tmp/prod.env ubuntu@aws:/tmp/prod.env
+ssh ubuntu@aws sudo mkdir -p "$dirname"
+ssh ubuntu@aws sudo cp /tmp/prod.env "$dirname"/.env
+echo "$dirname"/.env
